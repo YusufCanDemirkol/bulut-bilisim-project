@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Paylaşımı</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #2d2d2d;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .upload-box {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px dashed #565656;
+            border-radius: 10px;
+            background-color: #2d2d2d;
+            cursor: pointer;
+        }
+
+        .upload-box:hover {
+            border-color: #757575;
+        }
+
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .link-box {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #565656;
+            border-radius: 5px;
+            background-color: #2d2d2d;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Dosya Paylaşımı</h1>
+        <p>Bir dosya seçin ve paylaşım linkinizi oluşturun.</p>
+
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            Dosya seçmek için tıklayın
+            <input type="file" id="fileInput" style="display: none;">
+        </div>
+
+        <button class="button" onclick="generateLink()">Link Oluştur</button>
+
+        <div id="linkBox" class="link-box" style="display: none;">
+            Paylaşım Linkiniz: <span id="shareLink"></span>
+        </div>
+    </div>
+
+    <script>
+        function generateLink() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Lütfen bir dosya seçin!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://localhost:5000/upload', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.link) {
+                        const linkBox = document.getElementById('linkBox');
+                        const shareLink = document.getElementById('shareLink');
+                        shareLink.textContent = data.link;
+                        shareLink.style.color = "#4caf50";
+                        linkBox.style.display = "block";
+                    } else {
+                        alert('Dosya yüklenemedi');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading file:', error);
+                    alert('Bir hata oluştu');
+                });
+        }
+    </script>
+</body>
+
+</html>
